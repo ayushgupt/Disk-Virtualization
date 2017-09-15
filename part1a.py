@@ -1,59 +1,91 @@
-# diskA = [bytearray(100) for i in range(200)]
-# diskB = [bytearray(100) for i in range(300)]
+# This file supports read write to a block; it doesn't support disk creation
 
-diskA = []
-for i in range (200) :
-    b = bytearray(100)
-    diskA.append (b)
+class BlockData:
+    def __init__(self,blockSize):
+        self.data=bytearray(blockSize)
 
-
-diskB = []
-for i in range (300) :
-    b = bytearray (100)
-    diskB.append(b)
-
-
-class metaData:
+class BlockMetaData:
     def __init__(self):
-        self.size = 0
-        self.free = True
+        self.free=True
 
 
-metaDataArray = []
-for i in range(500) :
-    meta = metaData()
-    metaDataArray.append(meta)
+class FileSystem:
+    def __init__(self,blockSize):
+        self.blockSize=blockSize
+        self.diskA = [BlockData(blockSize) for i in range(200)]
+        self.diskB = [BlockData(blockSize) for i in range(300)]
+        self.blocksMetaData = [BlockMetaData() for i in range(500)]
 
-
-def writeBlock (block_No, block_inf):
-    if (len(block_inf) > 100):
-        print ("Block Data Big : A block can have atmost 100 bytes of data")
-        return
-    if (block_No < 1 or block_No >500):
-        print ("Invalid Block No : Please Enter a block number between 1 and 500")
-        return
-    meta = metaDataArray[block_No-1]
-    meta.free = False
-    meta.size = len(block_inf)
-    if block_No <= 200:
-        block = diskA[block_No - 1]
-    else:
-        block = diskB[block_No - 200 - 1]
-    block[:len(block_inf)] = block_inf
-
-
-def readBlock(block_No, block_inf):
-    if (block_No < 1 or block_No >500):
-        print ("Invalid Block No : Please Enter a block number between 1 and 500")
-        return
-    metadata = metaDataArray[block_No - 1]
-    if (metadata.free):
-        print ("Block Free: No Information Stored in Block")
-        return
-    else:
-        if block_No <= 200:
-            block = diskA[block_No - 1]
+    def writeBlock(self, blockNum, writeData):
+        if blockNum<1 or blockNum>500:
+            print "Block Number is Invalid!"
+            return
+        if len(writeData)>self.blockSize:
+            print "Too much data to write in 1 block"
+            return
+        if not self.blocksMetaData[blockNum-1].free:
+            print "Over Writing to a Block"
+        self.blocksMetaData[blockNum-1].free=False
+        if blockNum>=1 and blockNum<=200:
+            self.diskA[blockNum-1].data[0:len(writeData)]=writeData
         else:
-            block = diskB[block_No - 200 - 1]
-        size = min(len(block_inf), metadata.size)
-        block_inf[:size] = block[:size]
+            self.diskB[blockNum-201].data[0:len(writeData)]=writeData
+        return
+
+
+    def readBlock(self,blockNum,readData):
+        if blockNum < 1 or blockNum > 500:
+            print "Block Number is Invalid!"
+            return
+        if self.blocksMetaData[blockNum-1].free:
+            print "Block is Free, Nothing to Read!"
+            return
+        lengthToRead=min(self.blockSize,len(readData))
+        print "reading Length",lengthToRead
+        if blockNum>=1 and blockNum<=200:
+            readData[0:lengthToRead]=self.diskA[blockNum-1].data[0:lengthToRead]
+        else:
+            readData[0:lengthToRead]=self.diskB[blockNum-201].data[0:lengthToRead]
+        return
+
+
+
+def runTests():
+    myFileSystem= FileSystem(100)
+    writeData1 = bytearray(b'2014CS50281')
+    writeData2 = bytearray(b'2014CS50435')
+    writeData3 = bytearray(b'2014CS10218')
+    writeData4 = bytearray(b'2014CS50258')
+    # Normal Writing to Free Blocks
+    print "TEST:Normal Writing to Free Blocks"
+    print ("Writing to 200 Block ,Data= "+writeData1.decode('utf-8'))
+    myFileSystem.writeBlock(200,writeData1)
+    print ("Writing to 400 Block ,Data= " + writeData2.decode('utf-8'))
+    myFileSystem.writeBlock(400, writeData2)
+    #OverWriting
+    print "TEST:OverWriting"
+    myFileSystem.writeBlock(400, writeData3)
+    #Writing to inValid Blocks
+    print "TEST:Writing to inValid Blocks"
+    myFileSystem.writeBlock(600, writeData4)
+    #Writing Large Data than BlockSize
+    print "TEST:Writing Large Data than BlockSize"
+    bigChar= ["a" for i in range(200)]
+    bigString="-".join(bigChar)
+    myFileSystem.writeBlock(100,bigString)
+
+    dataToRead = bytearray(11)
+    #Reading Normal Block
+    print "TEST:Reading Normal Block"
+    myFileSystem.readBlock(200,dataToRead)
+    print "readData=",dataToRead.decode('utf-8')
+    #Reading Empty Block
+    print "TEST:Reading Empty Block"
+    myFileSystem.readBlock(205, dataToRead)
+    #Reading invalid Block
+    print "TEST:Reading invalid Block"
+    myFileSystem.readBlock(0, dataToRead)
+
+
+if __name__ == '__main__':
+    runTests()
