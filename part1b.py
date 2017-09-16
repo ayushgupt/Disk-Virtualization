@@ -25,8 +25,7 @@ class DiskData:
         self.idDisk=idD
         self.sizeDisk=sizeD
         self.startIndexZeroIndexed=startIndex
-    def blocksInDisk(self):
-        return range(self.startIndexZeroIndexed,self.startIndexZeroIndexed+self.sizeDisk)
+
 
 
 class FileSystem:
@@ -53,6 +52,12 @@ class FileSystem:
             self.diskB[blockNum-201].data[0:len(writeData)]=writeData
         return
 
+    def printDiskAllocation(self):
+        for i in range(500):
+            diskName="NONE"
+            if(self.blocksMetaData[i].diskID != None):
+                diskName=self.blocksMetaData[i].diskID
+            print i+1,"::",diskName
 
     def readBlock(self,blockNum,readData):
         if blockNum < 1 or blockNum > 500:
@@ -78,7 +83,7 @@ class FileSystem:
         blockStart=-1
         for i in range(500):
             if(not self.blocksMetaData[i].allotted):
-                if((i+numBlocks)>=500):
+                if((i+numBlocks-1)>=500):
                     print "Don't have these many blocks to make Disk"
                     return False
                 else:
@@ -99,10 +104,11 @@ class FileSystem:
         if not id in self.diskList:
             print "There is no disk with such an ID!"
             return False
-        rangeTrav=self.diskList[id].blocksInDisk
-        for blocksNumber in rangeTrav:
+        dStart=self.diskList[id].startIndexZeroIndexed
+        dSize=self.diskList[id].sizeDisk
+        for blocksNumber in range(dStart,dStart+dSize):
             self.blocksMetaData[blocksNumber].freeFromDisk()
-        self.blocksMetaData.pop(id)
+        self.diskList.pop(id)
         return True
 
     def writeDisk(self, diskId, blockNum, writeData):
@@ -168,45 +174,56 @@ def runBlockTests():
 
 def runDiskTests():
     myFileSystem = FileSystem(100)
-    print "TEST:trying to create normal disk"
+    print "TEST:trying to create normal disk::\ncreateDisk(\"ayushDisk\",300)"
     result=myFileSystem.createDisk("ayushDisk",300)
+    print "ayushDisk.start =", myFileSystem.diskList["ayushDisk"].startIndexZeroIndexed
+    print "ayushDisk.size =" , myFileSystem.diskList["ayushDisk"].sizeDisk
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to create disk with same ID"
+    print "TEST:trying to create disk with same ID::\ncreateDisk(\"ayushDisk\", 100)"
     result =myFileSystem.createDisk("ayushDisk", 100)
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to create another disk"
+    print "TEST:trying to create another disk::\ncreateDisk(\"deepakDisk\",100)"
     result =myFileSystem.createDisk("deepakDisk",100)
+    print "deepakDisk.start =",myFileSystem.diskList["deepakDisk"].startIndexZeroIndexed
+    print "deepakDisk.size =" , myFileSystem.diskList["deepakDisk"].sizeDisk
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to delete normal disk"
+    print "TEST:trying to delete normal disk::\ndeleteDisk(\"ayushDisk\")"
     result =myFileSystem.deleteDisk("ayushDisk")
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to delete already deleted disk"
+    print "TEST:trying to delete already deleted disk::\ndeleteDisk(\"ayushDisk\")"
     result =myFileSystem.deleteDisk("ayushDisk")
     if result: print "SUCCESS"
     else: print "FAILURE";
-    print "TEST:trying to create another disk"
-    result =myFileSystem.createDisk("KapilDisk",250)
+    print "TEST:trying to create another disk::\ncreateDisk(\"kapilDisk\",250)"
+    result =myFileSystem.createDisk("kapilDisk",250)
+    print "kapilDisk.start =" , myFileSystem.diskList["kapilDisk"].startIndexZeroIndexed
+    print "kapilDisk.size =" , myFileSystem.diskList["kapilDisk"].sizeDisk
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to create another disk which is not possible without fragmentation"
-    result =myFileSystem.createDisk("AnkitDisk",120)
+    print "TEST:trying to create another disk which is not possible without fragmentation::\ncreateDisk(\"ankitDisk\",120)"
+    result =myFileSystem.createDisk("ankitDisk",120)
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to make a disk that should be made"
+    print "TEST:trying to make a disk that should be made::\ncreateDisk(\"ayushDisk\",100)"
     result =myFileSystem.createDisk("ayushDisk",100)
     if result: print "SUCCESS"
     else: print "FAILURE"
-    print "TEST:trying to make a disk that should be made"
+    #print myFileSystem.printDiskAllocation()
+    print "TEST:trying to make a disk that should be made::\ncreateDisk(\"ankitDisk\", 50)"
     result =myFileSystem.createDisk("ankitDisk", 50)
+    print "ankitDisk.start =" , myFileSystem.diskList["ankitDisk"].startIndexZeroIndexed
+    print "ankitDisk.size =" , myFileSystem.diskList["ankitDisk"].sizeDisk
     if result: print "SUCCESS"
     else: print "FAILURE"
 
 
 
 if __name__ == '__main__':
+    print "Disk Tests Start"
     runDiskTests()
+    print "\n\n\n\n\n\n\n\n\nBlock Tests Start"
     runBlockTests()
