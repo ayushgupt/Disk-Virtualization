@@ -173,6 +173,10 @@ def runBlockTests():
 
 
 def runDiskTests():
+    writeData1 = bytearray(b'2014CS50281')
+    writeData2 = bytearray(b'2014CS50435')
+    writeData3 = bytearray(b'2014CS10218')
+    writeData4 = bytearray(b'2014CS50258')
     myFileSystem = FileSystem(100)
     print "TEST:trying to create normal disk::\ncreateDisk(\"ayushDisk\",300)"
     result=myFileSystem.createDisk("ayushDisk",300)
@@ -221,6 +225,21 @@ def runDiskTests():
     else: print "FAILURE"
 
 
+    readBuffer1=bytearray(11)
+    readBuffer2 = bytearray(11)
+    print "TEST::writeDisk(\"kapilDisk\",200,writeData1)::::::Normal Write To Disk"
+    myFileSystem.writeDisk("kapilDisk",200,writeData1)
+    print "TEST::readDisk(\"kapilDisk\",200,readBuffer1)::::::Normal Read From Disk"
+    myFileSystem.readDisk("kapilDisk",200,readBuffer1)
+    print "readData=",readBuffer1.decode('utf-8')
+    print "TEST::writeDisk(\"kapilDisk\",300,writeData2)::::::write to invalid block"
+    myFileSystem.writeDisk("kapilDisk",300,writeData2)
+    print "TEST::readDisk(\"kapilDisk\", 300, readBuffer1)::::::read from invalid block"
+    myFileSystem.readDisk("kapilDisk", 300, readBuffer1)
+    print "TEST::readDisk(\"ayushDisk\", 100, readBuffer2)::::::read from free block"
+    myFileSystem.readDisk("ayushDisk", 100, readBuffer2)
+    print "TEST::myFileSystem.readDisk(\"amanDisk\", 100, readBuffer2)::::::read from Invalid Disk"
+    myFileSystem.readDisk("amanDisk", 100, readBuffer2)
 
 if __name__ == '__main__':
     print "Disk Tests Start"
