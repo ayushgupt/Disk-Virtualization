@@ -140,7 +140,7 @@ class FileSystem:
 
     def replicationBlock(self,diskId):
         for blockNum in self.diskList[diskId].replicaList:
-            if(self.blocksMetaData[blockNum].free and not self.blocksMetaData[blockNum].errorFlag):
+            if(not self.blocksMetaData[blockNum].errorFlag and self.blocksMetaData[blockNum].free):
                 return blockNum
         return None
 
@@ -161,6 +161,7 @@ class FileSystem:
             print "Can't find a block to replicate on this disk"
         replicaWriteTry=self.writeBlock(replicaBlockNum+1, writeData)
         if replicaWriteTry:
+            self.blocksMetaData[self.diskList[diskId].blockList[blockNum-1]].replicationBlock=replicaBlockNum
             print "Successfully wrote in Replica! :)"
         else:
             print "Am not able to write in Replica! :("
@@ -183,7 +184,7 @@ class FileSystem:
         replPhyId=self.blocksMetaData[origPhyId].replicationBlock
         if(replPhyId == None):
             print "Dont have a replica to read from! :("
-        replReadTry=self.readBlock(self.diskList[diskId].blockList[blockNum-1]+1, readData)
+        replReadTry=self.readBlock(replPhyId+1, readData)
         if(not replReadTry):
             print "Am not able to read from replica :("
         else:
@@ -234,7 +235,7 @@ def runBlockTests():
 def runDiskTests():
     writeData1 = bytearray(b'2014CS50281')
     writeData2 = bytearray(b'2014CS50435')
-    myFileSystem = FileSystem(100,True,0.1)
+    myFileSystem = FileSystem(100,False,0.1)
     print "TEST:trying to create normal disk::\ncreateDisk(\"ayushDisk\",300)"
     result=myFileSystem.createDisk("ayushDisk",300)
     if result: print "SUCCESS"
@@ -292,17 +293,28 @@ def runDiskTests():
     print "TEST::myFileSystem.readDisk(\"amanDisk\", 100, readBuffer2)::::::read from Invalid Disk"
     myFileSystem.readDisk("amanDisk", 100, readBuffer2)
 
-    #Write once to ayushDisk of 30 length
-    for i in range(30):
+
+
+def runErrorTests():
+    writeData1 = bytearray(b'2014CS50281')
+    writeData2 = bytearray(b'2014CS50435')
+    readBuffer1= bytearray(20)
+    myFileSystem = FileSystem(100, True, 0.1)
+
+    myFileSystem.createDisk("ayushDisk",10)
+
+    for i in range(10):
         myFileSystem.writeDisk("ayushDisk",i+1,writeData1)
 
-    for k in range(1000):
-        for t in range(30):
+    for k in range(100):
+        for t in range(10):
             myFileSystem.readDisk("ayushDisk",t+1,readBuffer1)
 
     print "errorBlocks",myFileSystem.corruptBlocksCount
 
+
 if __name__ == '__main__':
+    runErrorTests()
     print "Disk Tests Start"
     runDiskTests()
     print "\n\n\n\n\n\n\n\n\nBlock Tests Start"
