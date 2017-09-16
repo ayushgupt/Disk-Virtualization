@@ -1,4 +1,5 @@
-# This file supports read write to a block; it doesn't support disk creation
+# This file supports read write to a block
+# it doesn't support disk creation
 
 class BlockData:
     def __init__(self,blockSize):

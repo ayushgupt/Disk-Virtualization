@@ -1,4 +1,6 @@
-# Disk Creation and Deletion Supported; Fragmentation Problem solved; Checkpointing and Snapshoting available;
+# Disk Creation and Deletion Supported
+# Fragmentation Problem solved (Allocation using Free Lists)
+# Checkpointing and Snapshoting available;
 from Queue import *
 import copy
 

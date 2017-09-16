@@ -1,4 +1,5 @@
-# Disk Creation and Deletion Supported; Contiguous Allocation;
+# Disk Creation and Deletion Supported
+# Contiguous Allocation;
 
 class BlockData:
     def __init__(self,blockSize):
