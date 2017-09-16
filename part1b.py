@@ -121,7 +121,7 @@ class FileSystem:
         self.writeBlock(self.diskList[diskId].startIndexZeroIndexed + blockNum, writeData)
         return True
 
-    def readDisk(self,diskId,blockNum,readData):
+    def readDisk(self,s):
         if not diskId in self.diskList:
             print "There is no such diskId present"
             return False
