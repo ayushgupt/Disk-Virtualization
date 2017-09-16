@@ -1,4 +1,6 @@
-# Disk Creation and Deletion Supported; Fragmentation Problem solved;
+# Disk Creation and Deletion Supported
+# Fragmentation Problem solved;
+# Simulation of Errors in Block can be done
 from Queue import *
 import random
 
@@ -306,16 +308,21 @@ def runErrorTests():
     for i in range(10):
         myFileSystem.writeDisk("ayushDisk",i+1,writeData1)
 
-    for k in range(100):
+    for k in range(10):
+        print "--------------------ITERATION::", k+1, "---------------------"
         for t in range(10):
+            print "reading Index",t+1
             myFileSystem.readDisk("ayushDisk",t+1,readBuffer1)
+
+
 
     print "errorBlocks",myFileSystem.corruptBlocksCount
 
 
 if __name__ == '__main__':
+    print "Error Simulation"
     runErrorTests()
-    print "Disk Tests Start"
+    print "\n\n\n\n\n\n\n\n\nDisk Tests Start"
     runDiskTests()
     print "\n\n\n\n\n\n\n\n\nBlock Tests Start"
     runBlockTests()

@@ -1,4 +1,5 @@
-# Disk Creation and Deletion Supported; Fragmentation Problem solved;
+# Disk Creation and Deletion Supported
+# Fragmentation Problem solved, As No Contiguous Allocation
 from Queue import *
 
 class BlockData:
