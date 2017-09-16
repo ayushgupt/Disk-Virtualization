@@ -18,7 +18,7 @@ class FileSystem:
         self.blocksMetaData = [BlockMetaData() for i in range(500)]
 
     def writeBlock(self, blockNum, writeData):
-        if blockNum<1 or blockNum>500:
+        if blockNum<1 or blockNum>500:D
             print "Block Number is Invalid!"
             return
         if len(writeData)>self.blockSize:
