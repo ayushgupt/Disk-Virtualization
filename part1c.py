@@ -113,7 +113,7 @@ class FileSystem:
         if blockNum<1 or blockNum> len(self.diskList[diskId].blockList):
             print "Block Number is outside bounds of Disk"
             return False
-        self.writeBlock(self.diskList[diskId].blockList[blockNum-1], writeData)
+        self.writeBlock(self.diskList[diskId].blockList[blockNum-1]+1, writeData)
         return True
 
     def readDisk(self,diskId,blockNum,readData):
@@ -123,7 +123,7 @@ class FileSystem:
         if blockNum<1 or blockNum> len(self.diskList[diskId].blockList):
             print "Block Number is outside bounds of Disk"
             return False
-        self.readBlock(self.diskList[diskId].blockList[blockNum-1], readData)
+        self.readBlock(self.diskList[diskId].blockList[blockNum-1]+1, readData)
         return True
 
 
